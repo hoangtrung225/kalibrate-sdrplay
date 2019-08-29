@@ -41,3 +41,21 @@ double arfcn_to_freq(int n, int *bi = 0);
 int freq_to_arfcn(double freq, int *bi = 0);
 int first_chan(int bi);
 int next_chan(int chan, int bi);
+
+enum {
+	VIETTEL = 0, 
+	MOBIFONE = 1, 
+	VINAPHONE = 2, 
+	VIETNAMOBILE = 3, 
+	GMOBILE = 4
+};
+
+static double vn_arfcn_up_GSM_900[] = {880, 890, 898.5, 906.7, 914.9};
+// GSM 900 band VIETNAMOBILE = 0, VINAPHONE = 1, VIETTEL = 2, MOBIFONE = 3
+static int vn_mnc_GSM_900[] = {2, 3, 1, 0, -1};
+static double vn_arfcn_down_GSM_900[] = {925, 935, 943.5, 951.7, 959.9};
+
+static double vn_arfcn_up_DCS_1800[] = {1710, 1730, 1750, 1770, 1785};
+// DCS 1800 band VINAPHONE = 0, MOBIFONE = 1, VIETTEL = 2, GMOBILE = 3
+static int vn_mnc_DCS_1800[] = {2, 1, 0, -1, 3};
+static double vn_arfcn_down_DCS_1800[] = {1805, 1825, 1845, 1865, 1880};

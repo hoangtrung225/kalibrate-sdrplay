@@ -55,12 +55,12 @@ static double vectornorm2(const complex *v, const unsigned int len) {
 }
 
 
-int c0_detect(usrp_source *u, int bi) {
+int c0_detect(usrp_source *u, int bi, int mnc) {
 
 #define GSM_RATE (1625000.0 / 6.0)
 #define  NOTFOUND_MAX 10
 
-	int i, chan_count;
+	int i, chan_count, provider;
 	unsigned int overruns, b_len, frames_len, found_count, notfound_count, r;
 	float offset, spower[BUFSIZ];
 	double freq, sps, n, power[BUFSIZ], sum = 0, a;
@@ -85,6 +85,19 @@ int c0_detect(usrp_source *u, int bi) {
 	u->flush();
 	for(i = first_chan(bi); i >= 0; i = next_chan(i, bi)) {
 		freq = arfcn_to_freq(i, &bi);
+		if(mnc != -1 && bi == GSM_900)
+		{
+			provider = vn_mnc_GSM_900[mnc];
+			if(provider != -1 && (freq < vn_arfcn_down_GSM_900[provider] * 1e6|| freq > vn_arfcn_down_GSM_900[provider + 1] * 1e6))
+				continue;
+		}
+		else if (mnc != -1 && bi == DCS_1800)
+		{
+			provider = vn_mnc_DCS_1800[mnc];
+			if(provider != -1 && (freq < vn_arfcn_down_DCS_1800[provider] * 1e6|| freq > vn_arfcn_down_DCS_1800[provider + 1] * 1e6))
+				continue;
+		}
+
 		if(!u->tune(freq)) {
 			fprintf(stderr, "error: usrp_source::tune\n");
 			return -1;

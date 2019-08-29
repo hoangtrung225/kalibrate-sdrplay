@@ -91,6 +91,7 @@ void usage(char *prog) {
 	printf("\t-b\tband indicator (GSM850, GSM-R, GSM900, EGSM, DCS, PCS)\n");
 	printf("\t-g\tgain in dB\n");
 	printf("\t-d\trtl-sdr device index\n");
+	printf("\t-n\tvietnam network provider\n");
 	printf("\t-e\tinitial frequency error in ppm\n");
 	printf("\t-v\tverbose\n");
 	printf("\t-D\tenable debug messages\n");
@@ -102,6 +103,7 @@ void usage(char *prog) {
 int main(int argc, char **argv) {
 
 	char *endptr;
+	int mnc = -1;
 	int c, antenna = 1, bi = BI_NOT_DEFINED, chan = -1, bts_scan = 0;
 	int ppm_error = 0;
 	unsigned int subdev = 0, decimation = 192;
@@ -110,7 +112,7 @@ int main(int argc, char **argv) {
 	double freq = -1.0, fd;
 	usrp_source *u;
 
-	while((c = getopt(argc, argv, "f:c:s:b:R:A:g:e:d:vDh?")) != EOF) {
+	while((c = getopt(argc, argv, "f:c:s:b:R:A:g:e:n:d:vDh?")) != EOF) {
 		switch(c) {
 			case 'f':
 				freq = strtod(optarg, 0);
@@ -200,6 +202,20 @@ int main(int argc, char **argv) {
 
 			case 'D':
 				g_debug = 1;
+				break;
+			case 'n':
+				if(!strcmp(optarg, "VIETTEL"))
+					mnc = VIETTEL;
+				else if(!strcmp(optarg, "VIETNAMOBILE"))
+					mnc = VIETNAMOBILE;
+				else if(!strcmp(optarg, "MOBIFONE"))
+					mnc = MOBIFONE;
+				else if(!strcmp(optarg, "VINAPHONE"))
+					mnc = VINAPHONE;
+				else if(!strcmp(optarg, "GMOBILE"))
+					mnc = GMOBILE;
+				else
+					mnc = -1;
 				break;
 
 			case 'h':
@@ -295,6 +311,5 @@ int main(int argc, char **argv) {
 
 	fprintf(stderr, "%s: Scanning for %s base stations.\n",
 	   basename(argv[0]), bi_to_str(bi));
-
-	return c0_detect(u, bi);
+	return c0_detect(u, bi, mnc);
 }
